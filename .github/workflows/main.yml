@@ -1,0 +1,33 @@
+name: "Crawl and build the anki deck"
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: jorgebg/stateful-action@v0.1
+      with:
+        branch: state
+
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Crawl
+      run: python -m dgt_tests -v crawl
+
+    - name: Build the anki deck
+      run: python -m dgt_tests -v anki
